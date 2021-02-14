@@ -11,6 +11,7 @@ if(!LOCAL){
   h1.style.top = '0px';
   h1.style.left = '0px';
   h1.style.margin = '18px';
+  h1.style.color = '#aa0';
   h1.innerText = 'Loading...';
   await O.raf2a(O.nop);
 }
