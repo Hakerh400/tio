@@ -35,12 +35,17 @@ const langs = esolangs.getLangs().
 const hwStr = esolangs.getStr('hello-world');
 
 const ioAdapters = [
-  ['Default', null],
+  ['No adapter', null],
   ['Padding', 'text'],
   ['Bijection', 'byte-array'],
 ];
 
 let firstLang = 'Text';
+
+let srcEncoding = 'UTF-8';
+let inputAdapter = 'text';
+let outputAdapter = 'text';
+
 let headerText = '';
 let codeText = '';
 let footerText = '';
@@ -64,7 +69,7 @@ parseUrl: {
   try{
     ser = new O.Serializer(buf, 1);
   }catch(err){
-    errMsg = `Invalid URL`;
+    errMsg = `Invalid URL checksum`;
     break parseUrl;
   }
 
@@ -92,6 +97,11 @@ parseUrl: {
   }
 
   firstLang = lang;
+
+  srcEncoding = ser.readStr();
+  inputAdapter = ser.readStr();
+  outputAdapter = ser.readStr();
+
   headerText = ser.readStr();
   codeText = ser.readStr();
   footerText = ser.readStr();
@@ -102,7 +112,7 @@ parseUrl: {
 
 const sectsInfo = [
   ['Header', 1, headerText, null],
-  ['Code', 1, 1, Encoding.UTF8],
+  ['Code', 1, 1, Encoding[srcEncoding]],
   ['Footer', 1, footerText, null],
   ['Input', 1, 1, null],
   ['Output', 0, 1, null],
@@ -173,6 +183,8 @@ class Interface{
     O.ceBr(this.optsElem, 2);
 
     for(const type of ['input', 'output']){
+      const adapterType = type === 'input' ? inputAdapter : outputAdapter;
+
       this[`${type}AdapterChoice`] = O.ceDiv(this.optsElem, 'opt-wrap');
       this[`${type}AdapterChoiceLabel`] = O.ceDiv(this[`${type}AdapterChoice`], 'opt-lab');
       this[`${type}AdapterChoiceLabel`].innerText = `${O.cap(type)} adapter:`;
@@ -183,7 +195,7 @@ class Interface{
         item.innerText = adapter;
         item.value = fmt || '';
 
-        if(adapter === 'Padding')
+        if(item.value === adapterType)
           item.selected = 1;
       }
     }
@@ -304,8 +316,8 @@ class Interface{
 
         const input = this.get('Input');
 
-        const inputAdapter = this.inputAdapterList.value || null;
-        const outputAdapter = this.outputAdapterList.value || null;
+        const inputAdapter = this.getInputAdapter();
+        const outputAdapter = this.getOutputAdapter();
 
         const opts = {
           inputAdapter,
@@ -351,6 +363,18 @@ class Interface{
     });
   }
 
+  getSrcEncoding(){
+    return this.#sects['Code'].encoding;
+  }
+
+  getInputAdapter(){
+    return this.inputAdapterList.value || null;
+  }
+
+  getOutputAdapter(){
+    return this.outputAdapterList.value || null;
+  }
+
   hasHwProg(){
     return hasHwProg(this.info);
   }
@@ -389,6 +413,10 @@ class Interface{
       ser.writeDouble(O.now);
       ser.writeStr(lang);
 
+      ser.writeStr(this.getSrcEncoding().getName());
+      ser.writeStr(this.getInputAdapter() || '');
+      ser.writeStr(this.getOutputAdapter() || '');
+
       ser.writeStr(this.get('Header'));
       ser.writeStr(code);
       ser.writeStr(this.get('Footer'));
@@ -401,7 +429,9 @@ class Interface{
       return buf.toString('base64');
     };
 
-    const url = `${O.baseURL}/?project=${O.project}&data=${getData()}`;
+    const {project} = O;
+    const urlProjectInfo = project === 'main' ? '?' : `?project=${project}&`;
+    const url = `${O.baseURL}/${urlProjectInfo}data=${getData()}`;
     const tioLabel = `TIO-${(O.now).toString(16)}${O.randBuf(2).toString('hex')}`;
 
     const str = `# ${

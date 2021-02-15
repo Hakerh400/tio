@@ -21,5 +21,5 @@ class UTF8 extends Encoding{
 }
 
 module.exports = Object.assign(Encoding, {
-  UTF8,
+  [UTF8.getName()]: UTF8,
 });
