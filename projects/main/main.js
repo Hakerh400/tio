@@ -58,12 +58,12 @@ parseUrl: {
   const data = O.urlParam('data', null);
   if(data === null) break parseUrl;
 
-  if(!/^[a-zA-Z0-9\+\/]*\=*$/.test(data)){
+  if(!/^[a-zA-Z0-9]*\=*$/.test(data)){
     errMsg = `Invalid URL`;
     break parseUrl;
   }
 
-  const buf = O.base64.decode(data);
+  const buf = O.base62.decode(data);
   let ser;
 
   try{
@@ -426,7 +426,7 @@ class Interface{
       ser.writeStr(this.get('Debug'));
 
       const buf = ser.getOutput(1);
-      return buf.toString('base64');
+      return O.base62.encode(buf);
     };
 
     const {project} = O;
