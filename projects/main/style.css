@@ -97,6 +97,7 @@ body{
 
 textarea{
   color: inherit;
+  scrollbar-width: none;
 }
 
 *{
@@ -107,4 +108,10 @@ textarea{
 
 select.opt{
   max-width: 225px;
+}
+
+textarea::-webkit-scrollbar{
+  display: none;
+  visibility: hidden;
+  opacity: 0;
 }
