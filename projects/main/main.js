@@ -125,7 +125,7 @@ const btnRunLabels = [
   'Running...',
 ];
 
-const main = async () => {
+const main = () => {
   loadingDiv.remove();
 
   const intface = new Interface(O.body);
@@ -226,20 +226,6 @@ class Interface{
         this.run();
         return;
       }
-
-      // if(evt.ctrlKey && evt.code === 'KeyR'){
-      //   evt.preventDefault();
-      //   this.setLang(O.randElem(langs.filter(a => !esolangs.getInfo(a).wip && ![
-      //     'HQ9+',
-      //     'HQ9++',
-      //     'Bitwise Trance',
-      //     'BitBounce',
-      //   ].includes(a))));
-      //   this.set('Code', O.randBuf(O.rand(1e3)).toString());
-      //   this.set('Input', O.randBuf(O.rand(1e3)).toString());
-      //   this.run();
-      //   return;
-      // }
     });
 
     this.sectsElem = O.ceDiv(this.div, 'sections');
