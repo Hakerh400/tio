@@ -24,7 +24,12 @@ const esolangs = require('@hakerh400/esolangs');
 const Encoding = require('./encoding');
 
 const UID = 'esolangs';
-const VERSION = '1.0.0';
+const VERSION = O.urlParam('ver', '1.0.0');
+
+const versions = [
+  '1.0.0',
+  '1.0.1',
+];
 
 const sem = new O.Semaphore(1);
 
@@ -82,7 +87,7 @@ parseUrl: {
 
   const ver = O.ca(3, () => ser.readUint()).join('.');
 
-  if(ver !== VERSION){
+  if(!versions.includes(ver)){
     errMsg = `Unsupported version ${ver}`;
     break parseUrl;
   }
@@ -104,6 +109,10 @@ parseUrl: {
 
   headerText = ser.readStr();
   codeText = ser.readStr();
+
+  if(ver === '1.0.1')
+    codeText = await require(codeText);
+
   footerText = ser.readStr();
   inputText = ser.readStr();
   outputText = ser.readStr();
