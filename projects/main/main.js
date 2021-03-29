@@ -25,6 +25,7 @@ const Encoding = require('./encoding');
 
 const UID = 'esolangs';
 const VERSION = O.urlParam('ver', '1.0.0');
+const WIKI_EXPORT = O.urlParam('wiki', 0) & 1;
 
 const versions = [
   '1.0.0',
@@ -427,17 +428,24 @@ class Interface{
     const {project} = O;
     const urlProjectInfo = project === 'main' ? '?' : `?project=${project}&`;
     const url = `${O.baseURL}/${urlProjectInfo}data=${getData()}`;
-    const tioLabel = `TIO-${(O.now).toString(16)}${O.randBuf(2).toString('hex')}`;
+    const tio = 'Try it online';
+    let str;
 
-    const str = `# ${
-      O.has(info, 'details') && /^https?\:\/\/\S+$/.test(info.details) ? `[${
-      escapedLang}]` : escapedLang}, ${
-      this.getBytesNum()} bytes\n\n${
-      O.sanl(code).map(line => {
-        return `${' '.repeat(4)}${line.replace(/[\x00-\x1F]+/g, '')}`;
-      }).join('\n')}\n\n[Try it online!][${tioLabel}]\n\n[${
-      escapedLang}]: ${info.details}\n[${
-      tioLabel}]: ${url}`;
+    if(WIKI_EXPORT){
+      str = `[${url} ${tio}]`;
+    }else{
+      const tioLabel = `TIO-${(O.now).toString(16)}${O.randBuf(2).toString('hex')}`;
+
+      str = `# ${
+        O.has(info, 'details') && /^https?\:\/\/\S+$/.test(info.details) ? `[${
+        escapedLang}]` : escapedLang}, ${
+        this.getBytesNum()} bytes\n\n${
+        O.sanl(code).map(line => {
+          return `${' '.repeat(4)}${line.replace(/[\x00-\x1F]+/g, '')}`;
+        }).join('\n')}\n\n[${tio}!][${tioLabel}]\n\n[${
+        escapedLang}]: ${info.details}\n[${
+        tioLabel}]: ${url}`;
+    }
 
     this.expand('Export');
     this.set('Export', str);
